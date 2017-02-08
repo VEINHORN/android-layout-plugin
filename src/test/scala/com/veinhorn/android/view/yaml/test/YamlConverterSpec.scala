@@ -1,5 +1,6 @@
 package com.veinhorn.android.view.yaml.test
 
+import com.esotericsoftware.yamlbeans.YamlReader
 import com.veinhorn.android.view.yaml.YamlTransformator
 import org.apache.commons.io.IOUtils
 import org.scalatest.FlatSpec
@@ -13,6 +14,7 @@ class YamlConverterSpec extends FlatSpec {
     val input = getClass.getClassLoader.getResourceAsStream("activity_main.yaml")
     val yaml = loadFile("activity_main.yaml")
     val xmlView = transformator.transform(yaml)
+    val reader = new YamlReader(yaml).read()
     println("ok")
   }
 

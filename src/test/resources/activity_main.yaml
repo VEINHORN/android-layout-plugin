@@ -1,19 +1,18 @@
 LinearLayout:
   id: rootLayout
   orientation: vertical
-
-  RelativeLayout:
-    TextView:
-      id: firstNameTextView
-      text: Martin
-    TextView:
-          id: secondNameTextView
-          text: Fowler
-    TextView:
-      if: ageTextView
-      text: 22
-
   LinearLayout:
-      TextView:
-        id: bioTextView
-        text: "several lines about bio..."
+    id: linId
+    TextView:
+      id: bioTextView
+      text: "several lines about bio..."
+  LinearLayout:
+    - TextView:
+      id: bioTextView
+      text: "several lines about bio..."
+    - TextView:
+      id: bioTextView
+      text: "several lines about bio..."
+    - TextView:
+      id: bioTextView
+      text: "several lines about bio..."
