@@ -4,8 +4,16 @@ LinearLayout:
 
   RelativeLayout:
     TextView:
-      id: nameTextView
-      text: Martin Fowler
+      id: firstNameTextView
+      text: Martin
+    TextView:
+          id: secondNameTextView
+          text: Fowler
     TextView:
       if: ageTextView
       text: 22
+
+  LinearLayout:
+      TextView:
+        id: bioTextView
+        text: "several lines about bio..."

@@ -1,0 +1,8 @@
+<LinearLayout orientation="vertical" id="rootLayout">
+    <RelativeLayout>
+        <TextView text="22" if="ageTextView"></TextView>
+    </RelativeLayout>
+    <LinearLayout>
+        <TextView text="several lines about bio..." id="bioTextView"></TextView>
+    </LinearLayout>
+</LinearLayout>

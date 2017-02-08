@@ -12,8 +12,8 @@ class YamlConverterSpec extends FlatSpec {
     val transformator = new YamlTransformator()
     val input = getClass.getClassLoader.getResourceAsStream("activity_main.yaml")
     val yaml = loadFile("activity_main.yaml")
-    println("test")
-    // transformator.transform()
+    val xmlView = transformator.transform(yaml)
+    println("ok")
   }
 
   private def loadFile(resource: String): String =
