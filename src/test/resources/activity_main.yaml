@@ -1,0 +1,11 @@
+LinearLayout:
+  id: rootLayout
+  orientation: vertical
+
+  RelativeLayout:
+    TextView:
+      id: nameTextView
+      text: Martin Fowler
+    TextView:
+      if: ageTextView
+      text: 22
