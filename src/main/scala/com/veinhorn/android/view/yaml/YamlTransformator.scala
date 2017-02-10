@@ -11,10 +11,11 @@ import scala.xml._
   */
 object YamlTransformator {
   val Unknown: String = "Unknown"
+  val DefaultNamespace = "android"
 }
 
 class YamlTransformator extends Transformator[String, String] {
-  import YamlTransformator.Unknown
+  import YamlTransformator._
 
   override def transform(yaml: String): String = {
     val yamlView = yaml.parseYaml.asYamlObject
@@ -30,7 +31,7 @@ class YamlTransformator extends Transformator[String, String] {
   private def generateXml(r: Elem, yamlView: YamlObject): Elem = {
     var root = r
     for (key <- yamlView.fields.keys) {
-      val elmTitle = key.convertTo[String]
+      val elmTitle = key.convertTo[String] // YAML element title
 
       yamlView.fields(key) match {
         case arr: YamlArray =>
@@ -39,8 +40,7 @@ class YamlTransformator extends Transformator[String, String] {
           }
         case _ =>
           Character.isLowerCase(elmTitle.head) match {
-            // TODO: Fix bug with type transformation
-            case true  => root = root % Attribute(None, elmTitle, Text(uniformType(yamlView.fields(key))), Null)
+            case true  => root = createAttribute(root, elmTitle, yamlView.fields(key)) // root % Attribute(None, elmTitle, Text(uniformType(yamlView.fields(key))), Null)
             case false => root = root.copy(child = root.child :+ generateXml(unknown.copy(label = elmTitle), yamlView.fields(key).asYamlObject))
           }
       }
@@ -48,10 +48,19 @@ class YamlTransformator extends Transformator[String, String] {
     root
   }
 
+  /** Creates new XML element with new attribute based on root element */
+  private def createAttribute(root: Elem, name: String, value: YamlValue): Elem =
+    root % Attribute(None, createNamespace(name), Text(uniformType(value)), Null)
+
+  private def createNamespace(name: String): String = name.split(":") match {
+    case Array(namespace, title) => name
+    case _                       => s"$DefaultNamespace:name"
+  }
+
   /** Converts specific YAML lib types to the uniform string type that's used in Scala XML */
   private def uniformType(value: YamlValue): String = value match {
-    case v: YamlString => v.convertTo[String]
     case v: YamlNumber => v.convertTo[Int].toString
+    case default => default.convertTo[String]
   }
 
   /** Creates unknown element */

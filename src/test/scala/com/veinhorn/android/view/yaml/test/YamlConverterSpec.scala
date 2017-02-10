@@ -1,21 +1,22 @@
 package com.veinhorn.android.view.yaml.test
 
-import com.esotericsoftware.yamlbeans.YamlReader
 import com.veinhorn.android.view.yaml.YamlTransformator
 import org.apache.commons.io.IOUtils
-import org.scalatest.FlatSpec
+import org.scalatest.{FlatSpec, Matchers}
+
+import scala.xml.XML
 
 /**
   * Created by Boris Korogvich on 08.02.2017.
   */
-class YamlConverterSpec extends FlatSpec {
-  it should "test android view convertion from YAML to XML" in {
-    val transformator = new YamlTransformator()
-    val input = getClass.getClassLoader.getResourceAsStream("activity_main.yaml")
+class YamlConverterSpec extends FlatSpec with Matchers {
+  it should "convert complex YAML Android view into proper XML" in {
     val yaml = loadFile("activity_main.yaml")
-    val xmlView = transformator.transform(yaml)
-    val reader = new YamlReader(yaml).read()
-    println("ok")
+    val xmlView = new YamlTransformator().transform(yaml)
+
+    val xmlElm = XML.loadString(xmlView)
+    (xmlElm \ "@layout_width").text should equal("match_parent")
+    (xmlElm \ "@layout_height").text should equal("match_parent")
   }
 
   private def loadFile(resource: String): String =
