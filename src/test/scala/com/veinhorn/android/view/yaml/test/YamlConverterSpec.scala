@@ -11,7 +11,7 @@ import scala.xml.XML
   */
 class YamlConverterSpec extends FlatSpec with Matchers {
   it should "convert complex YAML Android view into proper XML" in {
-    val yaml = loadFile("activity_main.yaml")
+    val yaml = loadFile("activity_profile.yaml")
     val xmlView = new YamlTransformator().transform(yaml)
 
     val xmlElm = XML.loadString(xmlView)

@@ -19,7 +19,7 @@ class YamlTransformator extends Transformator[String, String] {
 
   override def transform(yaml: String): String = {
     val yamlView = yaml.parseYaml.asYamlObject
-    new PrettyPrinter(100, 4).format(generate(yamlView))
+    new PrettyPrinter(200, 4).format(generate(yamlView))
   }
 
   @throws(classOf[Exception])
