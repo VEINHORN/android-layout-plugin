@@ -10,7 +10,7 @@ import scala.xml._
   * Created by Boris Korogvich on 08.02.2017.
   */
 object YamlTransformator {
-  val Unknown: String = "Unknown"
+  val Empty: String = "Empty"
   val DefaultNamespace = "android"
 }
 
@@ -24,37 +24,42 @@ class YamlTransformator extends Transformator[String, String] {
 
   @throws(classOf[Exception])
   private def generate(viewAst: YamlObject): Elem = viewAst.fields.keys.toList match {
-    case fields: List[YamlValue] if fields.length == 1 => generateXml(unknown.copy(label = fields.head.convertTo[String]), viewAst.fields(fields.head).asYamlObject)
+    case fields: List[YamlValue] if fields.length == 1 => generateXml(newElm.copy(label = fields.head.convertTo[String]), viewAst.fields(fields.head).asYamlObject)
     case _ => throw new Exception("Root view doesn't exist")
   }
 
+  /** Recursively converts YAML view to the XML */
   private def generateXml(r: Elem, yamlView: YamlObject): Elem = {
-    var root = r
-    for (key <- yamlView.fields.keys) {
+    yamlView.fields.keys.foldLeft(r) { (root, key) =>
       val elmTitle = key.convertTo[String] // YAML element title
-
       yamlView.fields(key) match {
-        case arr: YamlArray =>
-          for (k <- arr.elements) {
-            root = root.copy(child = root.child :+ generateXml(unknown.copy(label = elmTitle), k.asYamlObject))
-          }
-        case _ =>
-          Character.isLowerCase(elmTitle.head) match {
-            case true  => root = createAttribute(root, elmTitle, yamlView.fields(key)) // root % Attribute(None, elmTitle, Text(uniformType(yamlView.fields(key))), Null)
-            case false => root = root.copy(child = root.child :+ generateXml(unknown.copy(label = elmTitle), yamlView.fields(key).asYamlObject))
-          }
+        case array: YamlArray => fromArray(root, elmTitle, array)
+        case _                => fromObject(root, elmTitle, key, yamlView)
       }
     }
-    root
   }
+
+  /** It's some kind of YamlArray -> Elem recursive conversion */
+  private def fromArray(root: Elem, title: String, array: YamlArray) =
+    array.elements.foldLeft(root)((r, elm) => createElement(r, title, elm.asYamlObject))
+
+  /** It's some kind of YamlObject -> Elem recursive conversion */
+  private def fromObject(root: Elem, title: String, key: YamlValue, yamlView: YamlObject): Elem = Character.isLowerCase(title.head) match {
+    case true  => createAttribute(root, title, yamlView.fields(key))
+    case false => createElement(root, title, yamlView.fields(key).asYamlObject)
+  }
+
+  private def createElement(root: Elem, name: String, yamlView: YamlObject): Elem =
+    root.copy(child = root.child :+ generateXml(newElm.copy(label = name), yamlView))
 
   /** Creates new XML element with new attribute based on root element */
   private def createAttribute(root: Elem, name: String, value: YamlValue): Elem =
     root % Attribute(None, createNamespace(name), Text(uniformType(value)), Null)
 
+  /** Creates XML namespace based on title, or "android" as the default */
   private def createNamespace(name: String): String = name.split(":") match {
     case Array(namespace, title) => name
-    case _                       => s"$DefaultNamespace:name"
+    case _                       => s"$DefaultNamespace:$name"
   }
 
   /** Converts specific YAML lib types to the uniform string type that's used in Scala XML */
@@ -63,6 +68,6 @@ class YamlTransformator extends Transformator[String, String] {
     case default => default.convertTo[String]
   }
 
-  /** Creates unknown element */
-  private def unknown: Elem = <a></a>.copy(label = Unknown)
+  /** Just creates new empty element */
+  private def newElm: Elem = <x></x>.copy(label = Empty)
 }

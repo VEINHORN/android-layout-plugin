@@ -1,10 +1,17 @@
-<RelativeLayout layout_height="match_parent" layout_width="match_parent">
-    <LinearLayout orientation="vertical">
-        <ImageView src="http://vk.com/image.png" id="profile"></ImageView>
-        <EditText id="firstName" layout_height="wrap_contant" layout_width="wrap_contant"></EditText>
-        <EditText id="lastName" layout_height="wrap_contant" layout_width="wrap_contant"></EditText>
-        <EditText id="password" layout_height="wrap_contant" layout_width="wrap_contant"></EditText>
+<RelativeLayout
+        android:layout_width="match_parent" android:layout_height="match_parent" xmlns:android="http://schemas.android.com/apk/res/android">
+    <TextView android:layout_height="20dp" android:layout_width="10dp"></TextView>
+    <TextView android:layout_height="20dp" android:layout_width="10dp"></TextView>
+    <LinearLayout android:orientation="vertical">
+        <ImageView android:src="http://vk.com/image.png" android:id="profile"></ImageView>
+        <EditText
+                android:id="firstName" android:layout_height="wrap_contant" android:layout_width="wrap_contant">
+        </EditText>
+        <EditText
+                android:id="lastName" android:layout_height="wrap_contant" android:layout_width="wrap_contant">
+        </EditText>
+        <EditText
+                android:id="password" android:layout_height="wrap_contant" android:layout_width="wrap_contant">
+        </EditText>
     </LinearLayout>
-    <TextView layout_height="20dp" layout_width="10dp"></TextView>
-    <TextView layout_height="20dp" layout_width="10dp"></TextView>
 </RelativeLayout>
