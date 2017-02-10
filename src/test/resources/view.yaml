@@ -1,0 +1,4 @@
+LinearLayout:
+  layout_weight: 1
+  TextView:
+    text: Hi brah

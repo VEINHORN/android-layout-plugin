@@ -1,18 +1,28 @@
-LinearLayout:
-  id: rootLayout
-  orientation: vertical
+RelativeLayout:
+  layout_width: match_parent
+  layout_height: match_parent
+  TextView:
+    -
+      layout_width: 10dp
+      layout_height: 20dp
+    -
+      layout_width: 10dp
+      layout_height: 20dp
   LinearLayout:
-    id: linId
-    TextView:
-      id: bioTextView
-      text: "several lines about bio..."
-  LinearLayout:
-    - TextView:
-      id: bioTextView
-      text: "several lines about bio..."
-    - TextView:
-      id: bioTextView
-      text: "several lines about bio..."
-    - TextView:
-      id: bioTextView
-      text: "several lines about bio..."
+    orientation: vertical
+    EditText:
+      -
+        id: firstName
+        layout_width: wrap_contant
+        layout_height: wrap_contant
+      -
+        id: lastName
+        layout_width: wrap_contant
+        layout_height: wrap_contant
+      -
+        id: password
+        layout_width: wrap_contant
+        layout_height: wrap_contant
+    ImageView:
+      id: profile
+      src: http://vk.com/image.png

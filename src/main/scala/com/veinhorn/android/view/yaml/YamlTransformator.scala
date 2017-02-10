@@ -18,25 +18,31 @@ class YamlTransformator extends Transformator[String, String] {
 
   override def transform(yaml: String): String = {
     val yamlView = yaml.parseYaml.asYamlObject
-    new PrettyPrinter(100, 4).format(generateXml(yamlView))
+    new PrettyPrinter(100, 4).format(generate(yamlView))
   }
 
   @throws(classOf[Exception])
-  private def generateXml(viewAst: YamlObject): Elem = {
-    val keys = viewAst.fields.keys.toList
-    if (keys.length != 1) throw new Exception("Root view doesn't exist")
-    generateXml(unknown.copy(label = keys.head.convertTo[String]), viewAst.fields(keys.head).asYamlObject)
+  private def generate(viewAst: YamlObject): Elem = viewAst.fields.keys.toList match {
+    case fields: List[YamlValue] if fields.length == 1 => generateXml(unknown.copy(label = fields.head.convertTo[String]), viewAst.fields(fields.head).asYamlObject)
+    case _ => throw new Exception("Root view doesn't exist")
   }
 
   private def generateXml(r: Elem, yamlView: YamlObject): Elem = {
     var root = r
-    // TODO: Reduce code size
     for (key <- yamlView.fields.keys) {
       val elmTitle = key.convertTo[String]
-      Character.isLowerCase(elmTitle.head) match {
-        // TODO: Fix bug with type transformation
-        case true  => root = root % Attribute(None, elmTitle, Text(uniformType(yamlView.fields(key))), Null)
-        case false => root = root.copy(child = root.child :+ generateXml(unknown.copy(label = elmTitle), yamlView.fields(key).asYamlObject))
+
+      yamlView.fields(key) match {
+        case arr: YamlArray =>
+          for (k <- arr.elements) {
+            root = root.copy(child = root.child :+ generateXml(unknown.copy(label = elmTitle), k.asYamlObject))
+          }
+        case _ =>
+          Character.isLowerCase(elmTitle.head) match {
+            // TODO: Fix bug with type transformation
+            case true  => root = root % Attribute(None, elmTitle, Text(uniformType(yamlView.fields(key))), Null)
+            case false => root = root.copy(child = root.child :+ generateXml(unknown.copy(label = elmTitle), yamlView.fields(key).asYamlObject))
+          }
       }
     }
     root
