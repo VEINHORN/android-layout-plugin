@@ -53,8 +53,28 @@ class YamlTransformator extends Transformator[String, String] {
     root.copy(child = root.child :+ generateXml(newElm.copy(label = name), yamlView))
 
   /** Creates new XML element with new attribute based on root element */
-  private def createAttribute(root: Elem, name: String, value: YamlValue): Elem =
-    root % Attribute(None, createNamespace(name), Text(uniformType(value)), Null)
+  private def createAttribute(root: Elem, name: String, value: YamlValue): Elem = {
+    val optimizedValue = ValueOptimizer.simplify(name, uniformType(value))
+    root % Attribute(None, createNamespace(name), Text(optimizedValue), Null)
+  }
+
+  /** Make easy to use some kinds of android layout attributes */
+  object ValueOptimizer {
+    private val IdAttr = "id"
+
+    def simplify(key: String, value: String): String = key match {
+      case IdAttr => IdOptimizer(value).optimize()
+      case _      => value
+    }
+
+    private trait Optimizer {
+      def optimize(): String
+    }
+
+    private case class IdOptimizer(value: String) extends Optimizer {
+      override def optimize(): String = if (value.contains("@+id/")) value else "@+id/" + value
+    }
+  }
 
   /** Creates XML namespace based on title, or "android" as the default */
   private def createNamespace(name: String): String = name.split(":") match {

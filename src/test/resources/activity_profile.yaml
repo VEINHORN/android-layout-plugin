@@ -43,8 +43,8 @@ LinearLayout:
             layout_height: wrap_content
             text: "First name:"
           -
-            id: "@+id/firstName"
+            id: secondName
             layout_width: wrap_content
             layout_height: wrap_content
-            text: David
+            text: Coperfield
             layout_marginLeft: 15dp
