@@ -1,0 +1,4 @@
+LinearLayout:
+  id: parentView
+  ImageView:
+    src: image.png
