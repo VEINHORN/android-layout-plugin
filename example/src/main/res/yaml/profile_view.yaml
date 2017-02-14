@@ -1,0 +1,6 @@
+LinearView:
+  TextView:
+    id: firstNameTextView
+    text: David Blaine
+  ImageView:
+    src: image.png

@@ -1,0 +1,4 @@
+<LinearView>
+    <TextView id="@+id/firstNameTextView" text="David Blaine"></TextView>
+    <ImageView src="@drawable/image.png"></ImageView>
+</LinearView>
