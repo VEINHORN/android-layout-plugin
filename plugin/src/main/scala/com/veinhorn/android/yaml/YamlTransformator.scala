@@ -11,7 +11,7 @@ import scala.xml._
   */
 object YamlTransformator {
   val Empty: String = "Empty"
-  val DefaultNamespace = "android"
+  val DefaultNamespace: String = "android"
 }
 
 class YamlTransformator extends Transformator[String, String] {
@@ -27,7 +27,7 @@ class YamlTransformator extends Transformator[String, String] {
     case fields: List[YamlValue] if fields.length == 1 => generateXml(newElm.copy(label = fields.head.convertTo[String]), viewAst.fields(fields.head).asYamlObject)
     case _ => throw new Exception("Root view doesn't exist")
   }
-  
+
   private def generateXml(r: Elem, yamlView: YamlObject): Elem = {
     yamlView.fields.keys.foldLeft(r) { (root, key) =>
       val elmTitle = key.convertTo[String] // YAML element title
