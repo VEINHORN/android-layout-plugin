@@ -27,8 +27,7 @@ class YamlTransformator extends Transformator[String, String] {
     case fields: List[YamlValue] if fields.length == 1 => generateXml(newElm.copy(label = fields.head.convertTo[String]), viewAst.fields(fields.head).asYamlObject)
     case _ => throw new Exception("Root view doesn't exist")
   }
-
-  /** Recursively converts YAML view to the XML */
+  
   private def generateXml(r: Elem, yamlView: YamlObject): Elem = {
     yamlView.fields.keys.foldLeft(r) { (root, key) =>
       val elmTitle = key.convertTo[String] // YAML element title
@@ -39,11 +38,9 @@ class YamlTransformator extends Transformator[String, String] {
     }
   }
 
-  /** It's some kind of YamlArray -> Elem recursive conversion */
   private def fromArray(root: Elem, title: String, array: YamlArray) =
     array.elements.foldLeft(root)((r, elm) => createElement(r, title, elm.asYamlObject))
 
-  /** It's some kind of YamlObject -> Elem recursive conversion */
   private def fromObject(root: Elem, title: String, key: YamlValue, yamlView: YamlObject): Elem = Character.isLowerCase(title.head) match {
     case true  => createAttribute(root, title, yamlView.fields(key))
     case false => createElement(root, title, yamlView.fields(key).asYamlObject)
@@ -52,42 +49,21 @@ class YamlTransformator extends Transformator[String, String] {
   private def createElement(root: Elem, name: String, yamlView: YamlObject): Elem =
     root.copy(child = root.child :+ generateXml(newElm.copy(label = name), yamlView))
 
-  /** Creates new XML element with new attribute based on root element */
   private def createAttribute(root: Elem, name: String, value: YamlValue): Elem = {
-    val optimizedValue = ValueOptimizer.simplify(name, uniformType(value))
+    val optimizedValue = ValueOptimizer.optimize(name, uniformType(value))
     root % Attribute(None, createNamespace(name), Text(optimizedValue), Null)
   }
 
-  /** Make easy to use some kinds of android layout attributes */
-  object ValueOptimizer {
-    private val IdAttr = "id"
-
-    def simplify(key: String, value: String): String = key match {
-      case IdAttr => IdOptimizer(value).optimize()
-      case _      => value
-    }
-
-    private trait Optimizer {
-      def optimize(): String
-    }
-
-    private case class IdOptimizer(value: String) extends Optimizer {
-      override def optimize(): String = if (value.contains("@+id/")) value else "@+id/" + value
-    }
-  }
-
-  /** Creates XML namespace based on title, or "android" as the default */
   private def createNamespace(name: String): String = name.split(":") match {
     case Array(namespace, title) => name
-    case _                       => s"$DefaultNamespace:$name"
+    /** For now it's disabled, for easy testing */
+    case _                       => name // s"$DefaultNamespace:$name"
   }
 
-  /** Converts specific YAML lib types to the uniform string type that's used in Scala XML */
   private def uniformType(value: YamlValue): String = value match {
     case v: YamlNumber => v.convertTo[Int].toString
     case default => default.convertTo[String]
   }
 
-  /** Just creates new empty element */
   private def newElm: Elem = <x></x>.copy(label = Empty)
 }

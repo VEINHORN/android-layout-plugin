@@ -10,13 +10,15 @@ dependencies {
     compile gradleApi()
     compile localGroovy()
     compile 'org.scala-lang:scala-library:2.11.8'
-    compile group: 'org.scala-lang.modules', name: 'scala-xml_2.11', version: '1.0.6'
+    compile 'org.scala-lang.modules:scala-xml_2.11:1.0.6'
     compile group: 'net.jcazevedo', name: 'moultingyaml_2.11', version: '0.4.0'
     compile group: 'commons-io', name: 'commons-io', version: '2.5'
+    testCompile group: 'org.scalactic', name: 'scalactic_2.11', version: '3.0.1'
+    testCompile group: 'org.scalatest', name: 'scalatest_2.11', version: '3.0.1'
 }
 
 /** Fix bug with Scala integration */
 ScalaCompileOptions.metaClass.daemonServer = true
 ScalaCompileOptions.metaClass.fork = true
 ScalaCompileOptions.metaClass.useAnt = false
-ScalaCompileOptions.metaClass.useCompileDaemon = false
+ScalaCompileOptions.metaClass.useCompileDaemon = true
