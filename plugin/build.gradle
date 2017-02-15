@@ -17,6 +17,10 @@ dependencies {
     testCompile group: 'org.scalatest', name: 'scalatest_2.11', version: '3.0.1'
 }
 
+tasks.withType(GroovyCompile) { task ->
+  dependsOn compileScala
+}
+
 /** Fix bug with Scala integration */
 ScalaCompileOptions.metaClass.daemonServer = true
 ScalaCompileOptions.metaClass.fork = true
