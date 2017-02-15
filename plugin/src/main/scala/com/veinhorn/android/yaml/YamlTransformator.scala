@@ -3,6 +3,7 @@ package com.veinhorn.android.yaml
 import com.veinhorn.android.yaml.features.MultiIdFeature
 import net.jcazevedo.moultingyaml.DefaultYamlProtocol._
 import net.jcazevedo.moultingyaml._
+
 import scala.xml._
 
 
@@ -17,6 +18,8 @@ object YamlTransformator {
 class YamlTransformator extends Transformator[String, String] {
   import YamlTransformator._
 
+  var config: YamlConfig = _
+
   override def transform(yaml: String): String = {
     val yamlView = yaml.parseYaml.asYamlObject
     new PrettyPrinter(200, 4).format(generate(yamlView))
@@ -24,7 +27,9 @@ class YamlTransformator extends Transformator[String, String] {
 
   @throws(classOf[Exception])
   private def generate(viewAst: YamlObject): Elem = viewAst.fields.keys.toList match {
-    case fields: List[YamlValue] if fields.length == 1 => generateXml(newElm.copy(label = fields.head.convertTo[String]), viewAst.fields(fields.head).asYamlObject)
+    case fields: List[YamlValue] if fields.length == 1 =>
+      config = YamlConfig.init(viewAst)
+      generateXml(newElm.copy(label = fields.head.convertTo[String]), viewAst.fields(fields.head).asYamlObject)
     case _ => throw new Exception("Root view doesn't exist")
   }
 
@@ -48,6 +53,7 @@ class YamlTransformator extends Transformator[String, String] {
       createAttribute(root, title, yamlView.fields(key))
     case false => // element
       // Here we should use some features, based on attribute name
+      // TODO: Move feature detection to the separate class
       val yaml = yamlView.fields(key).asYamlObject
 
       val id = yaml.getFields(YamlString("id"))
@@ -65,14 +71,18 @@ class YamlTransformator extends Transformator[String, String] {
     root.copy(child = root.child :+ generateXml(newElm.copy(label = name), yamlView))
 
   private def createAttribute(root: Elem, name: String, value: YamlValue): Elem = {
-    val optimizedValue = ValueOptimizer.optimize(name, uniformType(value))
-    root % Attribute(None, createNamespace(name), Text(optimizedValue), Null)
+    // TODO: Remove it on config init stage
+    // Filter config attributes in
+    if (name == "prefixes") root
+    else {
+      val optimizedValue = ValueOptimizer.optimize(name, uniformType(value))
+      root % Attribute(None, createNamespace(name), Text(optimizedValue), Null)
+    }
   }
 
   private def createNamespace(name: String): String = name.split(":") match {
     case Array(namespace, title) => name
-    /** For now it's disabled, for easy testing */
-    case _                       => name // s"$DefaultNamespace:$name"
+    case _                       => if (config.usePrefixes) s"$DefaultNamespace:$name" else name
   }
 
   private def uniformType(value: YamlValue): String = value match {

@@ -1,0 +1,5 @@
+LinearLayout:
+  prefixes: true
+  ImageView:
+    id: myImageView
+    src: image.png

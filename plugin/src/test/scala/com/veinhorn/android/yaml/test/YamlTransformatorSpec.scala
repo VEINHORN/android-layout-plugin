@@ -24,4 +24,11 @@ class YamlTransformatorSpec extends LayoutSpec {
     // TODO: Implement tags checking
     val xmlElm = XML.loadString(xmlView)
   }
+
+  it should "test prefixes generation in attributes" in {
+    val yaml = loadResource("with_prefixes.yaml")
+    val xmlView = new YamlTransformator().transform(yaml)
+
+    val xmlElm = XML.loadString(xmlView)
+  }
 }
