@@ -3,7 +3,6 @@ package com.veinhorn.android.yaml.plugin
 import com.veinhorn.android.yaml.YamlTransformator
 import org.gradle.api.Plugin
 import org.gradle.api.Project
-import org.gradle.api.resources.TextResourceFactory
 
 /**
  * Created by veinhorn on 13.2.17.
