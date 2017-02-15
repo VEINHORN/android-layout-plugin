@@ -11,7 +11,7 @@ import org.gradle.api.resources.TextResourceFactory
 public class YamlViewPlugin implements Plugin<Project> {
     @Override
     void apply(Project project) {
-        project.task('genviews') {
+        project.task('generateViews') {
 
             doLast {
                 Set<File> files = project.fileTree('src/main/res/yaml').getFiles()
