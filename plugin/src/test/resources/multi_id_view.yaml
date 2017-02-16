@@ -3,10 +3,11 @@ LinearLayout:
     id: (myid1, myid2, myid3)
     layout_width: 20dp
     layout_height: 30dp
-  LinearView:
+  RelativeLayout:
     TextView:
       -
         id: (yoid1, yoid2, yoid3)
         text: some text
       -
+        id: yoid4
         text: some text 2
