@@ -21,9 +21,11 @@ project/plugins/project/
 build/
 tmp/
 example/build/
+example/src/main/res/layout/*.xml
 plugin/build/
 plugin/.idea/
 plugin/classes/
 buildSrc/.gradle/
 buildSrc/build/
 *.iml
+

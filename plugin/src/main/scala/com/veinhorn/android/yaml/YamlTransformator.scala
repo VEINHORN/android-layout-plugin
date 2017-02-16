@@ -1,6 +1,5 @@
 package com.veinhorn.android.yaml
 
-import com.veinhorn.android.yaml.features.MultiIdFeature
 import net.jcazevedo.moultingyaml.DefaultYamlProtocol._
 import net.jcazevedo.moultingyaml._
 
@@ -45,23 +44,16 @@ class YamlTransformator extends Transformator[String, String] {
 
   // TODO: Nested ids generation should be here
   private def fromArray(root: Elem, title: String, array: YamlArray) =
-    array.elements.foldLeft(root)((r, elm) => createElement(r, title, elm.asYamlObject))
+    array.elements.foldLeft(root) { (r, elm) =>
+      createElement(r, title, elm.asYamlObject)
+    }
 
   private def fromObject(root: Elem, title: String, key: YamlValue, yamlView: YamlObject): Elem = isAttribute(title) match {
     case true  => // attribute
-      val ok = "ok"
       createAttribute(root, title, yamlView.fields(key))
     case false => // element
-      // Here we should use some features, based on attribute name
-      // TODO: Move feature detection to the separate class
       val yaml = yamlView.fields(key).asYamlObject
-
-      val id = yaml.getFields(YamlString("id"))
-      if (title == "TextView" && id.nonEmpty && id.head.convertTo[String].matches("[(].*[)]")) {
-        val newYaml = new MultiIdFeature(title).transform(yaml)
-        generateXml(root, newYaml)
-      }
-      else createElement(root, title, yaml)
+      Feature.apply(title, yaml)(generateXml(root, _))(createElement(root, title, _))
   }
 
   private def isAttribute(title: String): Boolean =
@@ -71,7 +63,7 @@ class YamlTransformator extends Transformator[String, String] {
     root.copy(child = root.child :+ generateXml(newElm.copy(label = name), yamlView))
 
   private def createAttribute(root: Elem, name: String, value: YamlValue): Elem = {
-    // TODO: Remove it on config init stage
+    // TODO: Remove prefixes element from YAML on config init stage
     // Filter config attributes in
     if (name == "prefixes") root
     else {
