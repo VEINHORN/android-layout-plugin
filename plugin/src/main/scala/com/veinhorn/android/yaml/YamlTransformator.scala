@@ -14,10 +14,13 @@ object YamlTransformator {
   val DefaultNamespace: String = "android"
 }
 
-class YamlTransformator extends Transformator[String, String] {
+class YamlTransformator(var config: Option[YamlConfig] = None) extends Transformator[String, String] {
   import YamlTransformator._
 
-  var config: YamlConfig = _
+  /** Used mostly for tests */
+  def this(config: YamlConfig) = {
+    this(Option(config))
+  }
 
   override def transform(yaml: String): String = {
     val yamlView = yaml.parseYaml.asYamlObject
@@ -27,7 +30,8 @@ class YamlTransformator extends Transformator[String, String] {
   @throws(classOf[Exception])
   private def generate(viewAst: YamlObject): Elem = viewAst.fields.keys.toList match {
     case fields: List[YamlValue] if fields.length == 1 =>
-      config = YamlConfig.init(viewAst)
+      if (config.isEmpty) config = Some(YamlConfig.init(viewAst))
+      // TODO: Remove config elements from YAML
       generateXml(newElm.copy(label = fields.head.convertTo[String]), viewAst.fields(fields.head).asYamlObject)
     case _ => throw new Exception("Root view doesn't exist")
   }
@@ -37,22 +41,21 @@ class YamlTransformator extends Transformator[String, String] {
       val elmTitle = key.convertTo[String] // YAML element title
       yamlView.fields(key) match {
         case array: YamlArray => fromArray(root, elmTitle, array)
-        case _                => fromObject(root, elmTitle, key, yamlView)
+        case _                => fromObject(root, elmTitle, yamlView)
       }
     }
   }
 
-  // TODO: Nested ids generation should be here
   private def fromArray(root: Elem, title: String, array: YamlArray) =
     array.elements.foldLeft(root) { (r, elm) =>
-      createElement(r, title, elm.asYamlObject)
+      fromObject(r, title, YamlObject(YamlString(title) -> elm))
     }
 
-  private def fromObject(root: Elem, title: String, key: YamlValue, yamlView: YamlObject): Elem = isAttribute(title) match {
-    case true  => // attribute
-      createAttribute(root, title, yamlView.fields(key))
-    case false => // element
-      val yaml = yamlView.fields(key).asYamlObject
+  private def fromObject(root: Elem, title: String, yamlView: YamlObject): Elem = isAttribute(title) match {
+    case true  =>
+      createAttribute(root, title, yamlView.fields(YamlString(title)))
+    case false =>
+      val yaml = yamlView.fields(YamlString(title)).asYamlObject
       Feature.apply(title, yaml)(generateXml(root, _))(createElement(root, title, _))
   }
 
@@ -64,7 +67,7 @@ class YamlTransformator extends Transformator[String, String] {
 
   private def createAttribute(root: Elem, name: String, value: YamlValue): Elem = {
     // TODO: Remove prefixes element from YAML on config init stage
-    // Filter config attributes in
+    // Filter configuration elements
     if (name == "prefixes") root
     else {
       val optimizedValue = ValueOptimizer.optimize(name, uniformType(value))
@@ -74,7 +77,7 @@ class YamlTransformator extends Transformator[String, String] {
 
   private def createNamespace(name: String): String = name.split(":") match {
     case Array(namespace, title) => name
-    case _                       => if (config.usePrefixes) s"$DefaultNamespace:$name" else name
+    case _                       => if (config.map(_.usePrefixes).getOrElse(false)) s"$DefaultNamespace:$name" else name
   }
 
   private def uniformType(value: YamlValue): String = value match {
