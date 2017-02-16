@@ -13,6 +13,7 @@ public class YamlViewPlugin implements Plugin<Project> {
         project.task('generateViews') {
 
             doLast {
+                project.mkdir(new File("src/main/res/layout"))
                 Set<File> files = project.fileTree('src/main/res/yaml').getFiles()
                 for (file in files) {
                     println file.getAbsolutePath()
