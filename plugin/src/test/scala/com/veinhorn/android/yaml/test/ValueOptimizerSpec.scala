@@ -1,7 +1,7 @@
 package com.veinhorn.android.yaml.test
 
-import com.veinhorn.android.yaml.ValueOptimizer.{IdOptimizer, SrcOptimizer}
 import com.veinhorn.android.yaml.YamlTransformator
+import com.veinhorn.android.yaml.feature.AttributeFeature.{IdFeature, SrcFeature}
 
 import scala.xml.XML
 
@@ -10,13 +10,13 @@ import scala.xml.XML
   */
 class ValueOptimizerSpec extends LayoutSpec {
   it should "test id attribute optimization" in {
-    IdOptimizer("nameTextView").optimize() should equal("@+id/nameTextView")
-    IdOptimizer("@+id/nameTextView").optimize() should equal("@+id/nameTextView")
+    new IdFeature().feature("nameTextView") should equal("@+id/nameTextView")
+    new IdFeature().feature("@+id/nameTextView") should equal("@+id/nameTextView")
   }
 
   it should "test src attribute optimization" in {
-    SrcOptimizer("image.png").optimize() should equal("@drawable/image.png")
-    SrcOptimizer("@drawable/image.png").optimize() should equal("@drawable/image.png")
+    new SrcFeature().feature("image.png") should equal("@drawable/image.png")
+    new SrcFeature().feature("@drawable/image.png") should equal("@drawable/image.png")
   }
 
   it should "test prefixes optimization in generated XML layout" in {

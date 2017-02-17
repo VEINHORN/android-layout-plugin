@@ -1,15 +1,16 @@
-package com.veinhorn.android.yaml
+package com.veinhorn.android.yaml.feature
 
+import com.veinhorn.android.yaml.Transformator
 import net.jcazevedo.moultingyaml.DefaultYamlProtocol._
 import net.jcazevedo.moultingyaml._
 
 /**
-  * Feature works as a transformator from YamlObject to more complex YamlObject
+  * ElementFeature works as a transformator from YamlObject to more complex YamlObject
   */
-trait Feature extends Transformator[YamlObject, YamlObject]
+trait ElementFeature extends Feature with Transformator[YamlObject, YamlObject]
 
 /** For now it's element feature, based on element title */
-object Feature {
+object ElementFeature {
   /**
     * Try to apply feature to the element
     * @param title is element title
@@ -26,7 +27,7 @@ object Feature {
     else otherwise(yaml)
   }
 
-  private class MultiIdFeature(elmTitle: String) extends Feature {
+  private class MultiIdFeature(elmTitle: String) extends ElementFeature {
     override def transform(yaml: YamlObject): YamlObject = {
       val ids: Array[String] = yaml.getFields(YamlString("id")).head.convertTo[String].replaceAll("[()]", "").split("[ ,]+")
       // if (ids.length == 0) // TODO: Remove braces in case of length = 0

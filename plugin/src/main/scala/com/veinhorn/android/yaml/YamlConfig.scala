@@ -4,13 +4,13 @@ import net.jcazevedo.moultingyaml.DefaultYamlProtocol._
 import net.jcazevedo.moultingyaml._
 import net.jcazevedo.moultingyaml.{YamlObject, YamlString}
 
+// TODO: Add "namespaces" default option, if not specify, add default android namespaces
 object YamlConfig {
   def init(yaml: YamlObject): YamlConfig = {
     var usePrefixes = false
     yaml.fields(yaml.fields.keys.toList.head).asInstanceOf[YamlObject].getFields(YamlString("prefixes")).foreach { p =>
       usePrefixes = p.convertTo[Boolean]
     }
-    val ok = "ok"
     YamlConfig(usePrefixes)
   }
 }

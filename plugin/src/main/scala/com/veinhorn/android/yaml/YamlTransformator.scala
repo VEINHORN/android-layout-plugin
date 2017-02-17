@@ -1,5 +1,6 @@
 package com.veinhorn.android.yaml
 
+import com.veinhorn.android.yaml.feature.{AttributeFeature, ElementFeature}
 import net.jcazevedo.moultingyaml.DefaultYamlProtocol._
 import net.jcazevedo.moultingyaml._
 
@@ -10,11 +11,11 @@ import scala.xml._
   * Created by Boris Korogvich on 08.02.2017.
   */
 object YamlTransformator {
-  val Empty: String = "Empty"
   val DefaultNamespace: String = "android"
 }
 
 class YamlTransformator(var config: Option[YamlConfig] = None) extends Transformator[String, String] {
+  import Util._
   import YamlTransformator._
 
   /** Used mostly for tests */
@@ -56,7 +57,7 @@ class YamlTransformator(var config: Option[YamlConfig] = None) extends Transform
       createAttribute(root, title, yamlView.fields(YamlString(title)))
     case false =>
       val yaml = yamlView.fields(YamlString(title)).asYamlObject
-      Feature.apply(title, yaml)(generateXml(root, _))(createElement(root, title, _))
+      ElementFeature.apply(title, yaml)(generateXml(root, _))(createElement(root, title, _))
   }
 
   private def isAttribute(title: String): Boolean =
@@ -70,7 +71,7 @@ class YamlTransformator(var config: Option[YamlConfig] = None) extends Transform
     // Filter configuration elements
     if (name == "prefixes") root
     else {
-      val optimizedValue = ValueOptimizer.optimize(name, uniformType(value))
+      val optimizedValue = AttributeFeature.apply(root.label, name, uniformType(value))// ValueOptimizer.optimize(name, uniformType(value))
       root % Attribute(None, createNamespace(name), Text(optimizedValue), Null)
     }
   }
@@ -84,6 +85,4 @@ class YamlTransformator(var config: Option[YamlConfig] = None) extends Transform
     case v: YamlNumber => v.convertTo[Int].toString
     case default => default.convertTo[String]
   }
-
-  private def newElm: Elem = <x></x>.copy(label = Empty)
 }
