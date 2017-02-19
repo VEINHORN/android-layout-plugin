@@ -3,7 +3,7 @@ package com.veinhorn.android.yaml
 import scala.xml.Elem
 
 object Util {
-  private val Empty: String = "Empty"
+  def newElm(title: String): Elem = newElm.copy(label = title)
 
-  def newElm: Elem = <x></x>.copy(label = Empty)
+  private def newElm: Elem = <Empty></Empty>.copy(minimizeEmpty = true)
 }

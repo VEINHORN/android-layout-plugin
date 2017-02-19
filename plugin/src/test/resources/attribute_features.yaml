@@ -1,0 +1,6 @@
+LinearLayout:
+  TextView:
+    text: some text data
+  ImageView:
+    id: myId
+    src: ^myImageView

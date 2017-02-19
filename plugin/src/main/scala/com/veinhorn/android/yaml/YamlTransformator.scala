@@ -33,7 +33,7 @@ class YamlTransformator(var config: Option[YamlConfig] = None) extends Transform
     case fields: List[YamlValue] if fields.length == 1 =>
       if (config.isEmpty) config = Some(YamlConfig.init(viewAst))
       // TODO: Remove config elements from YAML
-      generateXml(newElm.copy(label = fields.head.convertTo[String]), viewAst.fields(fields.head).asYamlObject)
+      generateXml(newElm(fields.head.convertTo[String]), viewAst.fields(fields.head).asYamlObject)
     case _ => throw new Exception("Root view doesn't exist")
   }
 
@@ -64,7 +64,7 @@ class YamlTransformator(var config: Option[YamlConfig] = None) extends Transform
     if (Character.isLowerCase(title.head)) true else false
 
   private def createElement(root: Elem, name: String, yamlView: YamlObject): Elem =
-    root.copy(child = root.child :+ generateXml(newElm.copy(label = name), yamlView))
+    root.copy(child = root.child :+ generateXml(newElm(name), yamlView))
 
   private def createAttribute(root: Elem, name: String, value: YamlValue): Elem = {
     // TODO: Remove prefixes element from YAML on config init stage

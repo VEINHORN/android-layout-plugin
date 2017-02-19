@@ -9,7 +9,7 @@ import scala.xml.XML
   */
 class YamlTransformatorSpec extends LayoutSpec {
   it should "test YAML to XML android view transformation" in {
-    val yaml = loadResource("activity_main.yaml")
+    val yaml = loadYamlResource("activity_main")
     val xmlView = new YamlTransformator().transform(yaml)
 
     val xmlElm = XML.loadString(xmlView)
@@ -17,8 +17,8 @@ class YamlTransformatorSpec extends LayoutSpec {
     (xmlElm \ "@layout_height").text should equal("match_parent")
   }
 
-  it should "test YAML to XML android view transformation (multi ids)" in {
-    val yaml = loadResource("multi_id_view.yaml")
+  it should "test multi ids feature" in {
+    val yaml = loadYamlResource("multi_id_view")
     val xmlView = new YamlTransformator().transform(yaml)
 
     // TODO: Implement tags checking
@@ -26,7 +26,14 @@ class YamlTransformatorSpec extends LayoutSpec {
   }
 
   it should "test prefixes generation in attributes" in {
-    val yaml = loadResource("with_prefixes.yaml")
+    val yaml = loadYamlResource("with_prefixes")
+    val xmlView = new YamlTransformator().transform(yaml)
+
+    val xmlElm = XML.loadString(xmlView)
+  }
+
+  it should "test attribute features" in {
+    val yaml = loadYamlResource("attribute_features")
     val xmlView = new YamlTransformator().transform(yaml)
 
     val xmlElm = XML.loadString(xmlView)

@@ -6,7 +6,7 @@ trait AttributeFeature extends Feature {
 
 object AttributeFeature {
   /** Attribute feature signs */
-  val AndroidResourcePrefix: String = "!"
+  val AndroidResourcePrefix: String = "^"
   /** */
 
   val IdPrefix: String = "@+id/"
@@ -32,7 +32,10 @@ object AttributeFeature {
   class SrcFeature extends AttributeFeature {
     override def feature(value: String): String =
       if (value.startsWith(DrawablePrefix)) value
-      else if (value.startsWith(AndroidResourcePrefix)) AndroidDrawablePrefix + value
+      else if (value.startsWith(AndroidResourcePrefix)) addPrefix(AndroidDrawablePrefix, value)(AndroidResourcePrefix)
       else DrawablePrefix + value
   }
+
+  private def addPrefix(prefix: String, value: String)(sign: String): String =
+    prefix + value.replace(sign, "")
 }
