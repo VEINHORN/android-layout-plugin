@@ -1,3 +1,0 @@
-<LinearLayout layout_width="20dp">
-    <TextView id="@+id/myTextView"></TextView>
-</LinearLayout>

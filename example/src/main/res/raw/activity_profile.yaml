@@ -1,0 +1,12 @@
+LinearLayout:
+  xmlns:android: http://schemas.android.com/apk/res/android
+  prefixes: true
+  layout_width: 20dp
+  TextView:
+    -
+      id: (yoid1, yoid2, yoid3)
+      layout_width: wrap_content
+      layout_height: wrap_content
+    -
+      id: yoid4
+      text: Some text data

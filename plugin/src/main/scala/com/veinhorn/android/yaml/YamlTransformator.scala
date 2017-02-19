@@ -19,9 +19,10 @@ class YamlTransformator(var config: Option[YamlConfig] = None) extends Transform
   import YamlTransformator._
 
   /** Used mostly for tests */
-  def this(config: YamlConfig) = {
-    this(Option(config))
-  }
+  def this(config: YamlConfig) = this(Option(config))
+
+  /** Used for Groovy code */
+  def this() = this(None)
 
   override def transform(yaml: String): String = {
     val yamlView = yaml.parseYaml.asYamlObject
@@ -31,7 +32,7 @@ class YamlTransformator(var config: Option[YamlConfig] = None) extends Transform
   @throws(classOf[Exception])
   private def generate(viewAst: YamlObject): Elem = viewAst.fields.keys.toList match {
     case fields: List[YamlValue] if fields.length == 1 =>
-      if (config.isEmpty) config = Some(YamlConfig.init(viewAst))
+      if (config.isEmpty) config = Some(YamlConfig.initialize(viewAst))
       // TODO: Remove config elements from YAML
       generateXml(newElm(fields.head.convertTo[String]), viewAst.fields(fields.head).asYamlObject)
     case _ => throw new Exception("Root view doesn't exist")
@@ -71,7 +72,7 @@ class YamlTransformator(var config: Option[YamlConfig] = None) extends Transform
     // Filter configuration elements
     if (name == "prefixes") root
     else {
-      val optimizedValue = AttributeFeature.apply(root.label, name, uniformType(value))// ValueOptimizer.optimize(name, uniformType(value))
+      val optimizedValue = AttributeFeature.apply(root.label, name, uniformType(value))
       root % Attribute(None, createNamespace(name), Text(optimizedValue), Null)
     }
   }

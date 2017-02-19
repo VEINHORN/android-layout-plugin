@@ -14,10 +14,11 @@ public class YamlViewPlugin implements Plugin<Project> {
 
             doLast {
                 project.mkdir(new File("src/main/res/layout"))
-                Set<File> files = project.fileTree('src/main/res/yaml').getFiles()
+                Set<File> files = project.fileTree('src/main/res/raw').getFiles()
+                YamlTransformator transformator = new YamlTransformator()
                 for (file in files) {
                     println file.getAbsolutePath()
-                    String xmlView = new YamlTransformator().transform(file.text)
+                    String xmlView = transformator.transform(file.text)
                     println xmlView
                     println file.parentFile.parent
                     println 'file name: ' + file.name.replace(".yaml", ".xml")

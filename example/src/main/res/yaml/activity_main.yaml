@@ -1,4 +1,0 @@
-LinearLayout:
-  layout_width: 20dp
-  TextView:
-      id: myTextView
