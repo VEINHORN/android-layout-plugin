@@ -11,36 +11,42 @@ trait ElementFeature extends Feature with Transformator[YamlObject, YamlObject]
 
 /** For now it's element feature, based on element title */
 object ElementFeature {
-  /**
-    * Try to apply feature to the element
-    * @param title is element title
-    * @param yaml is an input YAML object
-    * @param success is a generator function, based on transformed YAML object
-    * @param otherwise is a basic generator function, non-feature variant
-    * @tparam T generator result
-    */
-  // TODO: Improve readability
+  private val Id: YamlString = YamlString("id")
+
+  /** Tries to apply feature or just call otherwise function */
   def apply[T](title: String, yaml: YamlObject)(success: YamlObject => T)(otherwise: YamlObject => T): T = {
-    val id = yaml.getFields(YamlString("id"))
-    if (id.nonEmpty && id.head.convertTo[String].matches("[(].*[)]"))
-      success(new MultiIdFeature(title).transform(yaml))
-    else otherwise(yaml)
+    if (yaml.fields.contains(Id) && yaml.getFields(Id).nonEmpty) {
+      def newFeature(fromArray: Boolean) = new MultiIdFeature(title, fromArray).transform(yaml)
+      def isStringIds(id: YamlString) = id.convertTo[String].matches("[(].*[)]")
+
+      yaml.getFields(Id).head match {
+        case _:   YamlArray                      => return success(newFeature(true))
+        case sId: YamlString if isStringIds(sId) => return success(newFeature(false))
+        case _                                   =>
+      }
+    }
+    otherwise(yaml)
   }
 
-  private class MultiIdFeature(elmTitle: String) extends ElementFeature {
+  private class MultiIdFeature(elmTitle: String, fromArray: Boolean) extends ElementFeature {
     override def transform(yaml: YamlObject): YamlObject = {
-      val ids: Array[String] = yaml.getFields(YamlString("id")).head.convertTo[String].replaceAll("[()]", "").split("[ ,]+")
-      // if (ids.length == 0) // TODO: Remove braces in case of length = 0
-
+      val ids = getIds(yaml)
       YamlObject(
         YamlString(elmTitle) -> YamlArray(
           ids.map { id =>
             YamlObject(
-              yaml.fields.filter(_._1 != YamlString("id")) + (YamlString("id") -> YamlString(id))
+              yaml.fields.filter(_._1 != Id) + (Id -> YamlString(id))
             )
           }.toVector
         )
       )
+    }
+
+    private def getIds(yaml: YamlObject): Array[String] = fromArray match {
+      case true =>
+        yaml.getFields(Id).head.convertTo[Array[String]]
+      case _    =>
+        yaml.getFields(Id).head.convertTo[String].replaceAll("[()]", "").split("[ ,]+")
     }
   }
 }

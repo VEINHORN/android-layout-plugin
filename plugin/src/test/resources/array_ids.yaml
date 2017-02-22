@@ -1,0 +1,8 @@
+LinearLayout:
+  TextView:
+    -
+      id: [id1, id2, id3]
+      text: new text
+    -
+      id: (id4, id5, id6)
+      text: my new text

@@ -1,6 +1,8 @@
 package com.veinhorn.android.yaml.test
 
 import com.veinhorn.android.yaml.YamlTransformator
+import net.jcazevedo.moultingyaml.DefaultYamlProtocol._
+import net.jcazevedo.moultingyaml._
 
 import scala.xml.XML
 
@@ -8,6 +10,12 @@ import scala.xml.XML
   * Created by veinhorn on 14.2.17.
   */
 class YamlTransformatorSpec extends LayoutSpec {
+  it should "test array parsing" in {
+    val yaml = loadYamlResource("array_ids")
+    val xmlElm = new YamlTransformator().transform(yaml)
+    val ok = "ok"
+  }
+
   it should "test YAML to XML android view transformation" in {
     val yaml = loadYamlResource("activity_main")
     val xmlView = new YamlTransformator().transform(yaml)
